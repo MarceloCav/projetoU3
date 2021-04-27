@@ -8,74 +8,72 @@
 
 using namespace std;
 
-// Construtor da classe Sculptor
 Sculptor::Sculptor(int _nx, int _ny, int _nz){
     nx = _nx; ny = _ny; nz = _nz;
 
-    // Verifica se as quantidades de linhas, colunas e planos sao positivas
     if (nx <= 0 || ny <= 0 || nz <= 0){
         nx = ny = nz = 0;
     }
 
-    v = new Voxel**[nz]; //alocação dos planos
+    v = new Voxel**[nz]; 
 
-    v[0] = new Voxel*[nz*nx]; //alocação das linhas
+    v[0] = new Voxel*[nz*nx]; 
 
-    for (int z=1; z<nz; z++){ //contagem dos planos
-        v[z] = v[z-1] + nx;  //adicionando linhas nos planos
+    for (int z=1; z<nz; z++){ 
+        v[z] = v[z-1] + nx;  
     }
 
-    v[0][0] = new Voxel[nz*nx*ny]; //alocação de cada Voxel na matriz 3D
+    v[0][0] = new Voxel[nz*nx*ny]; 
 
-    //adicionando colunas entre as linhas e os planos
+    
     int n = 0;
-    for (int z=0; z<nz; z++){ // contagem de planos
-        for(int x=0; x<nx; x++){ //contagem de linhas
-            v[z][x] = v[0][0] + n*ny; //adição de colunas
+    for (int z=0; z<nz; z++){ 
+        for(int x=0; x<nx; x++){ 
+            v[z][x] = v[0][0] + n*ny;
             n++;
         }
     }
 }
 
-// Destrutor da classe Sculptor
+
 Sculptor::~Sculptor(){
-    delete [] v[0][0]; //liberaçao dos Voxels
-    delete [] v[0];   //liberação das linhas
-    delete [] v;      //liberação da escultura
+    delete [] v[0][0]; 
+    delete [] v[0];   
+    delete [] v;     
 }
 
 void Sculptor::setColor(float vermelho, float verde, float azul, float alpha){
-   r = vermelho; //tons de vermelho
-   g = verde;   //tons de verde
-   b = azul;    //tons de azul
-   a = alpha;   //opacidade [0-1]
+   r = vermelho; 
+   g = verde;   
+   b = azul;    
+   a = alpha;  
 }
 
-// Ativa o voxel na posição (x,y,z) (fazendo isOn = true) e atribui ao mesmo a cor atual de desenho
+
 void Sculptor::putVoxel(int x, int y, int z){
 
-    v[x][y][z].isOn = true; //habilita o Voxel da posição
-    v[x][y][z].r = r;       //atribuição de tom de vermelho
-    v[x][y][z].g = g;       //atribuição de tom de verde
-    v[x][y][z].b = b;       //atribuição de tem de azul
-    v[x][y][z].a = a;       //Opacidade do Voxel atual
+    v[x][y][z].isOn = true; 
+    v[x][y][z].r = r;      
+    v[x][y][z].g = g;     
+    v[x][y][z].b = b;      
+    v[x][y][z].a = a;     
 
 }
 
-//Desativa o voxel na posição (x,y,z) (fazendo isOn = false)
+
 void Sculptor::cutVoxel(int x, int y, int z){
-v[x][y][z].isOn = false; //desabilita o Voxel da posição
+v[x][y][z].isOn = false;
 }
 
 
-// Ativa todos os voxels no intervalo x∈[x0,x1], y∈[y0,y1], z∈[z0,z1] e atribui aos mesmos a cor atual de desenho
+
 void Sculptor::putBox(int x0, int x1, int y0, int y1, int z0, int z1){
 
-    for(int z=z0; z<=z1; z++){            //percorrendo planos
-        for(int y=y0; y<=y1; y++){        //percorrendo colunas
-            for(int x=x0; x<=x1; x++){    //percorrendo linhas
+    for(int z=z0; z<=z1; z++){            
+        for(int y=y0; y<=y1; y++){       
+            for(int x=x0; x<=x1; x++){  
 
-                putVoxel(x,y,z); //habilita os Voxels no intervalo
+                putVoxel(x,y,z); 
 
             }
         }
@@ -83,59 +81,58 @@ void Sculptor::putBox(int x0, int x1, int y0, int y1, int z0, int z1){
 
 }
 
-// Desativa todos os voxels no intervalo x∈[x0,x1], y∈[y0,y1], z∈[z0,z1] e atribui aos mesmos a cor atual de desenho
+
 void Sculptor::cutBox(int x0, int x1, int y0, int y1, int z0, int z1){
 
-    for(int z=z0; z<=z1; z++){            //percorrendo planos
-        for(int x=x0; x<=x1; x++){        //percorrendo linhas
-            for(int y=y0; y<=y1; y++){    //percorrendo colunas
+    for(int z=z0; z<=z1; z++){          
+        for(int x=x0; x<=x1; x++){      
+            for(int y=y0; y<=y1; y++){   
 
-                cutVoxel(x,y,z); //desabilita os Voxels no intervalo
+                cutVoxel(x,y,z); 
             }
         }
     }
 
 }
 
-//Ativa todos os voxels que satisfazem à equação da esfera e atribui aos mesmos a cor atual de desenho
 void Sculptor::putSphere(int xcenter, int ycenter, int zcenter, int radius){
 
     double distancia;
 
-    for(int z=0; z<=nz; z++){            //percorrendo planos
-        for(int y=0; y<=ny; y++){        //percorrendo colunas
-            for(int x=0; x<=nz; x++){    //percorrendo linhnas
+    for(int z=0; z<=nz; z++){            
+        for(int y=0; y<=ny; y++){       
+            for(int x=0; x<=nz; x++){ 
 
                 distancia = pow(x - xcenter, 2) + pow(y - ycenter, 2) + pow(z - zcenter, 2) ;
                 if(distancia <= pow(radius,2) ){
 
-                    putVoxel(x, y, z);  //habilita os Voxels no intervalo
+                    putVoxel(x, y, z);  
                 }
             }
         }
     }
 }
 
-//Desativa todos os voxels que satisfazem à equação da esfera
+
 void Sculptor::cutSphere(int xcenter, int ycenter, int zcenter, int radius){
 
     double distancia;
 
-    for(int z=0; z<=nz; z++){            //percorrendo planos
-        for(int y=0; y<=ny; y++){        //percorrendo colunas
-            for(int x=0; x<=nx; x++){    //percorrendo linhas
+    for(int z=0; z<=nz; z++){           
+        for(int y=0; y<=ny; y++){       
+            for(int x=0; x<=nx; x++){  
 
                 distancia = pow(x - xcenter, 2) + pow(y - ycenter, 2) + pow(z - zcenter, 2) ;
                 if(distancia <= pow(radius,2) ){
 
-                    cutVoxel(x, y, z);  //desabilita os Voxels no intervalo
+                    cutVoxel(x, y, z);  
                 }
             }
         }
     }
 }
 
-//Ativa todos os voxels que satisfazem à equação do elipsóide e atribui aos mesmos a cor atual de desenho
+
 void Sculptor::putEllipsoid(int xcenter, int ycenter, int zcenter, int rx, int ry, int rz){
 
     double distancia;
@@ -148,7 +145,7 @@ void Sculptor::putEllipsoid(int xcenter, int ycenter, int zcenter, int rx, int r
 
                 if(distancia <=1){
 
-                    putVoxel(xcenter, y, z); //habilita os Voxels no intervalo
+                    putVoxel(xcenter, y, z); 
                 }
 
             }
@@ -163,7 +160,7 @@ void Sculptor::putEllipsoid(int xcenter, int ycenter, int zcenter, int rx, int r
 
                 if(distancia <=1){
 
-                    putVoxel(x, ycenter, z); //habilita os Voxels no intervalo
+                    putVoxel(x, ycenter, z); 
                 }
 
             }
@@ -178,7 +175,7 @@ void Sculptor::putEllipsoid(int xcenter, int ycenter, int zcenter, int rx, int r
 
                 if(distancia <=1){
 
-                    putVoxel(x, y, zcenter); //habilita os Voxels no intervalo
+                    putVoxel(x, y, zcenter);
                 }
 
             }
@@ -193,8 +190,7 @@ void Sculptor::putEllipsoid(int xcenter, int ycenter, int zcenter, int rx, int r
                     distancia = pow(x - xcenter, 2)/pow(rx, 2) + pow(y - ycenter, 2)/pow(rz, 2) + pow(z - zcenter, 2)/pow(rz, 2);
                     if(distancia <= 1){
 
-                        putVoxel(x, y, z); //habilita os Voxels no intervalo
-
+                        putVoxel(x, y, z); 
                     }
                 }
             }
@@ -203,7 +199,6 @@ void Sculptor::putEllipsoid(int xcenter, int ycenter, int zcenter, int rx, int r
 
 }
 
-//Desativa todos os voxels que satisfazem à equação do elipsóide
 void Sculptor::cutEllipsoid(int xcenter, int ycenter, int zcenter, int rx, int ry, int rz){
 
     double distancia;
@@ -216,7 +211,7 @@ void Sculptor::cutEllipsoid(int xcenter, int ycenter, int zcenter, int rx, int r
 
                 if(distancia <=1){
 
-                    cutVoxel(xcenter, y, z); //desabilita os Voxels no intervalo
+                    cutVoxel(xcenter, y, z); 
                 }
 
             }
@@ -231,7 +226,7 @@ void Sculptor::cutEllipsoid(int xcenter, int ycenter, int zcenter, int rx, int r
 
                 if(distancia <=1){
 
-                    cutVoxel(x, ycenter, z); //desabilita os Voxels no intervalo
+                    cutVoxel(x, ycenter, z); 
                 }
 
             }
@@ -246,7 +241,7 @@ void Sculptor::cutEllipsoid(int xcenter, int ycenter, int zcenter, int rx, int r
 
                 if(distancia <=1){
 
-                    cutVoxel(x, y, zcenter); //desabilita os Voxels no intervalo
+                    cutVoxel(x, y, zcenter); 
                 }
 
             }
@@ -261,7 +256,7 @@ void Sculptor::cutEllipsoid(int xcenter, int ycenter, int zcenter, int rx, int r
                     distancia = pow(x - xcenter, 2)/pow(rx, 2) + pow(y - ycenter, 2)/pow(rz, 2) + pow(z - zcenter, 2)/pow(rz, 2);
                     if(distancia <= 1){
 
-                        cutVoxel(x, y, z); //desabilita os Voxels no intervalo
+                        cutVoxel(x, y, z); 
 
                     }
                 }
@@ -275,8 +270,7 @@ void Sculptor::cutEllipsoid(int xcenter, int ycenter, int zcenter, int rx, int r
 void Sculptor::writeOFF(char* filename){
     ofstream fout;
 
-    fixed(fout); // para corrigir precisão de casas decimais no arquivo .OFF
-
+    fixed(fout); 
     int Nvertices=0;
     int Nfaces=0;
     int aux=0;
@@ -349,7 +343,7 @@ void Sculptor::writeOFF(char* filename){
     }
 
     if(fout.is_open()){
-        cout << "Arquivo.OFF salvo com sucesso!"<<endl;
+        cout << "Arquivo.OFF salvo"<<endl;
     }
 
 }
